@@ -6,6 +6,7 @@
 package extratorcaracteristicas;
 
 import org.opencv.core.Mat;
+import org.opencv.core.Scalar;
 import org.opencv.imgcodecs.Imgcodecs;
 
 /**
@@ -38,25 +39,16 @@ public class FDMIC {
             this.quadrado[i] = i * i;
         }
 
-        for (int i = 0; i < NUM_LABELS; i++) {
-            for (int j = 0; j < RQUADMAX; j++) {
-                contador[i][j] = 0;
-            }
-        }
-
     }
 
-    public void fdmicMain() {
-
-        Imgcodecs imageCodecs = new Imgcodecs();
-
-        Mat imagem = Imgcodecs.imread("src\\imagens\\Entrada.png");
+    public double[] fdmicMain(Mat imagem) {
 
         int i, j, k, Nvox, auxFor;
         int u;
         int altura = imagem.height(); //altura
         int largura = imagem.width(); // largura
         int L = imagem.channels(); //num de cores
+
         int camadas = NUM_CAMADAS;
 
         double X[], Y[], Z[];
@@ -69,21 +61,22 @@ public class FDMIC {
         rotulos = new double[altura * largura * L];
 
         u = 0;
-        for (k = 0; k < L; k++) {
-            for (i = 0; k < altura; k++) {
-                for (j = 0; j < largura; j++) {
+        for (i = 0; i < altura; i++) {
+            for (j = 0; j < largura; j++) {
+                double data[] = imagem.get(i, j);
+                for (k = 0; k < L; k++) {
                     X[u] = i;
                     Y[u] = j;
-                    Z[u] = 0; //Imagem[i][j][k] / 255.0;
+                    Z[u] = data[2 - k] * (camadas - 1) / 255.0; //Imagem[i][j][k] / 255.0;
 
-                    rotulos[u] = 1 << (k - 1);//bitshift
+                    rotulos[u] = 1 << (k);//bitshift
                     u++;
                 }
             }
         }
 
-        double menor = INFINITO;
-        double maior = -INFINITO;
+        double menor = Double.MAX_VALUE;
+        double maior = -Double.MAX_VALUE;
 
         //Multiplica vetor por escalar
         for (auxFor = 0; auxFor < Z.length; auxFor++) {
@@ -96,14 +89,13 @@ public class FDMIC {
                 maior = Z[auxFor];
             }
 
-            Z[auxFor] = Z[auxFor] * (camadas - 1);
         }
 
         for (auxFor = 0; auxFor < Z.length; auxFor++) {
             Z[auxFor] = Z[auxFor] - menor;
         }
 
-        camadas = (int) maior + 1;
+        camadas = (int) maior - (int) menor + 1;
 
         Nvox = X.length;
 
@@ -121,9 +113,7 @@ public class FDMIC {
             }
         }
 
-        for (int a = 0; a < u; a++) {
-            System.out.println(a + " - " + Vretorno[a]);
-        }
+        return Vretorno;
     }
 
     public void transformadaDistancia(double X[], double Y[], double Z[],
@@ -133,8 +123,16 @@ public class FDMIC {
         N = N + (2 * RMAX);
         L = L + (2 * RMAX);
 
-        this.A = new int[M][N][L]; // faltou infinito
         this.V = new int[M][N][L];
+        this.A = new int[M][N][L];
+        for (int i = 0; i < M; i++) {
+            for (int j = 0; j < N; j++) {
+                for (int k = 0; k < L; k++) {
+                    A[i][j][k] = Integer.MAX_VALUE;
+                    V[i][j][k] = 0;
+                }
+            }
+        }
 
         this.inicializa(X, Y, Z, rotulos, Nvox, A, V);
         this.stepOne(M, N, L);
@@ -148,6 +146,7 @@ public class FDMIC {
             double rotulos[], int Nvox, int A[][][], int V[][][]) {
 
         for (int u = 0; u < Nvox; u++) {
+
             A[(int) X[u] + RMAX][(int) Y[u] + RMAX][(int) Z[u] + RMAX] = 0;
             V[(int) X[u] + RMAX][(int) Y[u] + RMAX][(int) Z[u] + RMAX] |= (int) rotulos[u]; // bit or
         }
@@ -356,12 +355,18 @@ public class FDMIC {
 
         int i, j, k, u;
 
+        for (i = 0; i < NUM_LABELS; i++) {
+            for (j = 0; j < RQUADMAX; j++) {
+                contador[i][j] = 0;
+            }
+        }
+
         for (k = 0; k < L; k++) {
             for (i = 0; i < M; i++) {
                 for (j = 0; j < N; j++) {
                     if (A[i][j][k] < RQUADMAX) {
                         for (u = 0; u < NUM_LABELS; u++) {
-                            if (V.length != 0 && bit.length != 0) {
+                            if ((V[i][j][k] & bit[u]) != 0) {
                                 contador[u][A[i][j][k]]++;
                             }
                         }
