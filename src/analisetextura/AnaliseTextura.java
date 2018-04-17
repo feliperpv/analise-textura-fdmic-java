@@ -30,11 +30,11 @@ public class AnaliseTextura {
         //File diretorio_img = new File("C:\\Users\\Cliente\\Desktop\\TCC\\Outex\\Base");
         //Vistex
         File diretorio_img = new File("C:\\Users\\Cliente\\Desktop\\TCC\\Vistex\\Base");
-        
+
         File[] imagens = diretorio_img.listFiles();
         int TAM_DIR = imagens.length;
         FDMIC fdmic = new FDMIC();
-        
+
         //Teste
         TAM_DIR = 10;
 
@@ -50,19 +50,25 @@ public class AnaliseTextura {
             }
             System.out.println("");
         }
-        
-        BufferedReader classe_txt
-                = new BufferedReader(new FileReader("C:\\Users\\Cliente\\Desktop\\TCC\\Vistex\\classe.txt"));
 
-        List<String> listaClasses = new ArrayList<>();
+        try {
+            BufferedReader classe_txt
+                    = new BufferedReader(new FileReader("C:\\Users\\Cliente\\Desktop\\TCC\\Vistex\\classe.txt"));
 
-        String c = classe_txt.readLine();
-        while (c != null) {
-            listaClasses.add(c);
-            c = classe_txt.readLine();
+            List<String> listaClasses = new ArrayList<>();
+
+            String c = classe_txt.readLine();
+            while (c != null) {
+                listaClasses.add(c);
+                c = classe_txt.readLine();
+            }
+
+            classe_txt.close();
+
+        } catch (IOException e) {
+            System.out.print("Erro ao abrir o arquvio classe.txt");
         }
 
-        classe_txt.close();
     }
 
 }
