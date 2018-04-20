@@ -8,7 +8,12 @@ package weka;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
+import weka.classifiers.Evaluation;
+import weka.classifiers.functions.LDA;
+import weka.core.Instances;
 
 /**
  *
@@ -55,6 +60,17 @@ public class Weka {
         FileOutputStream f = new FileOutputStream(arquivo);
         f.write(arff.getBytes());
         f.close();
+    }
+    
+    public void crossValidationEvaluation(Instances instances) throws Exception{
+        
+        LDA lda = new LDA();
+        Evaluation evaluation = new Evaluation(instances);
+        int numFolds = 10;
+        
+        evaluation.crossValidateModel(lda, instances, numFolds, new Random(1));
+        System.out.println(evaluation.toMatrixString());
+        System.out.println(evaluation.toSummaryString());
     }
     
 }

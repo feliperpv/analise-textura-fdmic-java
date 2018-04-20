@@ -39,8 +39,13 @@ public class Utils {
 
         int cont = 0;
         try {
+            //Vistex
+            //BufferedReader classe_txt
+            //      = new BufferedReader(new FileReader("C:\\Users\\Cliente\\Desktop\\TCC\\Vistex\\classe.txt"));
+
+            //Outex
             BufferedReader classe_txt
-                    = new BufferedReader(new FileReader("C:\\Users\\Cliente\\Desktop\\TCC\\Vistex\\classe.txt"));
+                    = new BufferedReader(new FileReader("C:\\Users\\Cliente\\Desktop\\TCC\\Outex\\classe.txt"));
 
             String c = classe_txt.readLine();
             while (c != null && cont < TAM_DIR) {
