@@ -50,6 +50,9 @@ public class AnaliseTextura {
             instances.setClassIndex(instances.numAttributes() - 1);
         }
         
+        //Normalização
+        weka.normalizeFilter(instances);
+                
         //Validação cruzada
         weka.crossValidationEvaluation(instances);
 

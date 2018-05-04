@@ -14,6 +14,8 @@ import java.util.Random;
 import weka.classifiers.Evaluation;
 import weka.classifiers.functions.LDA;
 import weka.core.Instances;
+import weka.filters.Filter;
+import weka.filters.unsupervised.attribute.Normalize;
 
 /**
  *
@@ -60,6 +62,16 @@ public class Weka {
         FileOutputStream f = new FileOutputStream(arquivo);
         f.write(arff.getBytes());
         f.close();
+    }
+    
+    public void normalizeFilter(Instances instances) throws Exception{
+        
+        Normalize filterNorm = new Normalize();
+        
+        filterNorm.setInputFormat(instances);
+        
+        instances = Filter.useFilter(instances, filterNorm);
+        
     }
     
     public void crossValidationEvaluation(Instances instances) throws Exception{
